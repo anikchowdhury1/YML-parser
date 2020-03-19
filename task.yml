@@ -1,0 +1,56 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: oa-service30001
+spec:
+  selector:
+    app: oa-app30001
+  type: NodePort
+  ports:
+    - port: 3000
+      nodePort: 30001
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oa-deployment30001
+  labels:
+    app: oa-app30001
+    keel.sh/policy: force
+    keel.sh/trigger: poll    
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+            app: oa-app30001
+  template:
+    metadata:
+       name: oa-app30001
+       labels:
+          app: oa-app30001
+    spec:
+         containers:
+           - name: oa-container
+             image: registry.gitlab.com/crowdnetwork/originalads-crawler:latest
+             volumeMounts:
+               - name : emptydir-volume
+                 mountPath: /cache
+             ports:
+               - containerPort: 3000
+             imagePullPolicy: Always
+             env:
+              - name: SERVER_ID
+                value: "30001"
+              - name: NODE_ENV
+                value: "production"
+              - name: EXECUTABLE_PATH
+                value: "/usr/bin/google-chrome"
+              - name: CACHE
+                value: "/cache"
+         volumes:
+           - name: emptydir-volume
+             emptyDir: {}
+         imagePullSecrets:
+           - name: originalads-crawler-deploytoken
