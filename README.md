@@ -1,6 +1,6 @@
 # yml_parser
 
-A Clojure library designed to ... well, that part is up to you.
+A CLI made by clojure that modifies yml files.
 
 ## Usage
 
